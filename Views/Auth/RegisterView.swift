@@ -19,6 +19,7 @@ struct RegisterView: View {
                 VStack(spacing: 20) {
                     headerText
                     fieldsSection
+                    errorSection
                     signUpButton
                     signInLink
                 }
@@ -29,8 +30,16 @@ struct RegisterView: View {
             .ignoresSafeArea(.keyboard, edges: .bottom)
             .navigationTitle("Create Account")
             .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .cancellationAction) {
+                    Button("Cancel") { dismiss() }
+                        .foregroundStyle(Color.appPrimary)
+                }
+            }
         }
     }
+
+    // MARK: - Subviews
 
     private var headerText: some View {
         Text("Join the food-sharing community")
@@ -77,6 +86,16 @@ struct RegisterView: View {
         }
     }
 
+    @ViewBuilder
+    private var errorSection: some View {
+        if let err = auth.errorMessage {
+            Label(err, systemImage: "exclamationmark.circle.fill")
+                .font(.footnote)
+                .foregroundStyle(.red)
+                .multilineTextAlignment(.center)
+        }
+    }
+
     private var signUpButton: some View {
         Button {
             Task {
@@ -84,14 +103,19 @@ struct RegisterView: View {
                                     password: password, phone: phone)
             }
         } label: {
-            Text("Create Account")
-                .font(.headline)
-                .frame(maxWidth: .infinity, minHeight: 52)
+            ZStack {
+                if auth.isLoading {
+                    ProgressView().tint(.white)
+                } else {
+                    Text("Create Account").font(.headline)
+                }
+            }
+            .frame(maxWidth: .infinity, minHeight: 52)
         }
         .buttonStyle(.borderedProminent)
         .controlSize(.large)
         .tint(Color.appPrimary)
-        .disabled(!isFormValid)
+        .disabled(!isFormValid || auth.isLoading)
     }
 
     private var signInLink: some View {
