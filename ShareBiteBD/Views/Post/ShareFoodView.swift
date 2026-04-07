@@ -18,6 +18,8 @@ struct ShareFoodView: View {
                     descriptionSection
                     dietarySection
                     locationSection
+                    imageSection
+                    submitButton
                 }
                 .padding(.horizontal, Constants.Spacing.horizontal)
                 .padding(.top, Constants.Spacing.vertical)
@@ -33,6 +35,17 @@ struct ShareFoodView: View {
                         .foregroundStyle(Constants.primary)
                         .accessibilityLabel("Cancel and go back")
                 }
+            }
+            .alert("Error", isPresented: .init(
+                get: { postVM.errorMessage != nil },
+                set: { if !$0 { postVM.errorMessage = nil } }
+            )) {
+                Button("OK", role: .cancel) { postVM.errorMessage = nil }
+            } message: {
+                Text(postVM.errorMessage ?? "")
+            }
+            .onChange(of: postVM.didSubmitSuccessfully) { _, success in
+                if success { dismiss() }
             }
         }
     }
@@ -70,6 +83,47 @@ struct ShareFoodView: View {
                 }
             }
         }
+    }
+
+    // MARK: - Image picker
+
+    private var imageSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionLabel("Post Image")
+            ImagePickerGrid(selectedImageName: $postVM.selectedImageName)
+        }
+    }
+
+    // MARK: - Submit
+
+    private var submitButton: some View {
+        Button {
+            Task {
+                guard let user = auth.currentUser else { return }
+                await postVM.submitPost(
+                    sharerId: user.id,
+                    sharerName: user.name,
+                    sharerPhone: user.phone
+                )
+            }
+        } label: {
+            Group {
+                if postVM.isSubmitting {
+                    ProgressView().tint(.white)
+                } else {
+                    Text("Share Food")
+                        .font(.headline)
+                }
+            }
+            .frame(maxWidth: .infinity)
+            .frame(height: 52)
+        }
+        .buttonStyle(.borderedProminent)
+        .controlSize(.large)
+        .tint(Constants.primary)
+        .disabled(!postVM.isFormValid || postVM.isSubmitting)
+        .accessibilityLabel("Share food post")
+        .padding(.bottom, 24)
     }
 
     // MARK: - Dietary Tags
