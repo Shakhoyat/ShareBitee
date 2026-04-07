@@ -25,4 +25,45 @@ final class PostViewModel: ObservableObject {
         !title.trimmingCharacters(in: .whitespaces).isEmpty &&
         !neighborhood.trimmingCharacters(in: .whitespaces).isEmpty
     }
+
+    // MARK: - Submit
+
+    func submitPost(sharerId: String, sharerName: String, sharerPhone: String) async {
+        guard isFormValid else {
+            errorMessage = "Please fill in all required fields."
+            return
+        }
+        isSubmitting = true
+        errorMessage = nil
+        defer { isSubmitting = false }
+
+        let now = Date()
+        let post = FoodPost(
+            id: UUID().uuidString,
+            sharerId: sharerId,
+            sharerName: sharerName,
+            sharerPhone: sharerPhone,
+            title: title.trimmingCharacters(in: .whitespaces),
+            description: description.trimmingCharacters(in: .whitespaces),
+            category: selectedCategory,
+            totalQuantity: quantity,
+            availableQuantity: quantity,
+            imageName: selectedImageName,
+            neighborhood: neighborhood.trimmingCharacters(in: .whitespaces),
+            area: area.trimmingCharacters(in: .whitespaces),
+            dietaryTags: dietaryTags.map { $0.rawValue },
+            expiresAt: now.addingTimeInterval(3 * 3600),
+            status: .available,
+            createdAt: now,
+            likesCount: 0,
+            likedBy: []
+        )
+
+        do {
+            try await FirestoreService.shared.createPost(post)
+            didSubmitSuccessfully = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 }
