@@ -14,6 +14,8 @@ struct ShareFoodView: View {
                 VStack(alignment: .leading, spacing: 24) {
                     titleSection
                     categorySection
+                    quantitySection
+                    descriptionSection
                 }
                 .padding(.horizontal, Constants.Spacing.horizontal)
                 .padding(.top, Constants.Spacing.vertical)
@@ -65,6 +67,40 @@ struct ShareFoodView: View {
                     }
                 }
             }
+        }
+    }
+
+    // MARK: - Quantity
+
+    private var quantitySection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionLabel("Servings Available *")
+            HStack {
+                Text("\(postVM.quantity) serving\(postVM.quantity == 1 ? "" : "s")")
+                    .font(.body)
+                    .foregroundStyle(Constants.textPrimary)
+                Spacer()
+                Stepper("", value: $postVM.quantity, in: 1...100)
+                    .labelsHidden()
+                    .accessibilityLabel("Servings stepper")
+                    .accessibilityValue("\(postVM.quantity) servings")
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 12)
+            .background(Color(.systemGray6))
+            .clipShape(RoundedRectangle(cornerRadius: Constants.Corner.button))
+        }
+    }
+
+    // MARK: - Description
+
+    private var descriptionSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionLabel("Description")
+            TextField("Briefly describe the food, freshness, allergens…",
+                      text: $postVM.description)
+                .fieldStyle()
+                .accessibilityLabel("Description of food")
         }
     }
 
