@@ -36,4 +36,21 @@ final class FirestoreService {
     func deletePost(postId: String) async throws {
         try await db.collection("foodPosts").document(postId).delete()
     }
+
+    // MARK: - Likes
+
+    func toggleLike(postId: String, userId: String, isLiked: Bool) async throws {
+        let ref = db.collection("foodPosts").document(postId)
+        if isLiked {
+            try await ref.updateData([
+                "likedBy": FieldValue.arrayRemove([userId]),
+                "likesCount": FieldValue.increment(Int64(-1))
+            ])
+        } else {
+            try await ref.updateData([
+                "likedBy": FieldValue.arrayUnion([userId]),
+                "likesCount": FieldValue.increment(Int64(1))
+            ])
+        }
+    }
 }
