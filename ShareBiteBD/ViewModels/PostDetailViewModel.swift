@@ -54,4 +54,58 @@ final class PostDetailViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
     }
+
+    // MARK: - Likes (optimistic)
+
+    func toggleLike(userId: String) {
+        let wasLiked = post.likedBy.contains(userId)
+        if wasLiked {
+            post.likedBy.removeAll { $0 == userId }
+            post.likesCount = max(0, post.likesCount - 1)
+        } else {
+            post.likedBy.append(userId)
+            post.likesCount += 1
+        }
+        Task {
+            do {
+                try await FirestoreService.shared.toggleLike(postId: post.id, userId: userId, isLiked: wasLiked)
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+        }
+    }
+
+    // MARK: - Reserve
+
+    func reserve(reserverId: String, reserverName: String) async {
+        let qty = reserveQuantity
+        guard qty > 0, qty <= post.availableQuantity else { return }
+        isReserving = true
+        defer { isReserving = false }
+        do {
+            let newQty = try await FirestoreService.shared.reserveServing(postId: post.id, quantity: qty)
+            post.availableQuantity = newQty
+            if newQty == 0 { post.status = .fullyClaimed }
+
+            // Create a Booking document so the reservation appears in BookingsView.
+            let booking = Booking(
+                id: UUID().uuidString,
+                postId: post.id,
+                foodTitle: post.title,
+                posterUid: post.sharerId,
+                posterName: post.sharerName,
+                reserverId: reserverId,
+                reserverName: reserverName,
+                quantity: qty,
+                status: .confirmed,
+                createdAt: Date()
+            )
+            try await FirestoreService.shared.createBooking(booking)
+
+            reserveQuantity = 1
+            showContactAlert = true
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 }
