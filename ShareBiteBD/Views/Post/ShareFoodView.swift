@@ -16,6 +16,8 @@ struct ShareFoodView: View {
                     categorySection
                     quantitySection
                     descriptionSection
+                    dietarySection
+                    locationSection
                 }
                 .padding(.horizontal, Constants.Spacing.horizontal)
                 .padding(.top, Constants.Spacing.vertical)
@@ -67,6 +69,44 @@ struct ShareFoodView: View {
                     }
                 }
             }
+        }
+    }
+
+    // MARK: - Dietary Tags
+
+    private var dietarySection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionLabel("Dietary Tags")
+            ForEach(DietaryTag.allCases) { tag in
+                Toggle(tag.label, isOn: Binding(
+                    get: { postVM.dietaryTags.contains(tag) },
+                    set: { isOn in
+                        if isOn {
+                            postVM.dietaryTags.insert(tag)
+                        } else {
+                            postVM.dietaryTags.remove(tag)
+                        }
+                    }
+                ))
+                .tint(Constants.primary)
+                .accessibilityLabel("\(tag.label) dietary tag")
+            }
+        }
+    }
+
+    // MARK: - Location
+
+    private var locationSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            sectionLabel("Pickup Neighborhood *")
+            TextField("e.g. Dhanmondi, Gulshan, Mirpur…", text: $postVM.neighborhood)
+                .fieldStyle()
+                .accessibilityLabel("Neighborhood input")
+
+            sectionLabel("Area (optional)")
+            TextField("e.g. Road 27, Block C", text: $postVM.area)
+                .fieldStyle()
+                .accessibilityLabel("Area input")
         }
     }
 
