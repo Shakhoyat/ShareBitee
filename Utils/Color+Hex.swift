@@ -13,3 +13,13 @@ extension Color {
         self.init(red: r, green: g, blue: b)
     }
 }
+
+// MARK: - App Palette (use these everywhere)
+extension Color {
+    static let appPrimary    = Color(hex: "7B5EA7")
+    static let appAccent     = Color(hex: "4B3480")
+    static let appSecondary  = Color(hex: "FF9800")
+    static let appBackground = Color(hex: "F5F5F5")
+    static let appTextSec    = Color(hex: "888888")
+    static let appSuccess    = Color(hex: "4CAF50")
+}
