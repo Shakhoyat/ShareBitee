@@ -1,0 +1,26 @@
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+
+# macOS
+.DS_Store
+__MACOSX/
+
+# Swift Package Manager
+.build/
+Packages/
+
+# CocoaPods
+Pods/
+
+# Firebase — never commit service credentials
+
+# Misc
+*.ipa
+*.dSYM.zip
+*.dSYM
+*.claude
+CLAUDE.md
+*.claude-flow
