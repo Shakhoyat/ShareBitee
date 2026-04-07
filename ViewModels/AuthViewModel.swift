@@ -57,4 +57,23 @@ final class AuthViewModel: ObservableObject {
             errorMessage = error.localizedDescription
         }
     }
+
+    func login(email: String, password: String) async {
+        isLoading = true; errorMessage = nil
+        defer { isLoading = false }
+        do {
+            let fbUser = try await AuthService.shared.login(email: email, password: password)
+            await loadUser(uid: fbUser.uid)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    func logout() {
+        do {
+            try AuthService.shared.signOut()
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
 }
