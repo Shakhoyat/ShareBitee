@@ -1,5 +1,24 @@
 import SwiftUI
 
+// MARK: - Safe area / keyboard helpers
+
+struct SafeBottomPadding: ViewModifier {
+    func body(content: Content) -> some View {
+        content
+            .safeAreaInset(edge: .bottom) {
+                Color.clear.frame(height: 80)
+            }
+    }
+}
+
+extension View {
+    func safeBottomPadding() -> some View {
+        modifier(SafeBottomPadding())
+    }
+}
+
+// MARK: -
+
 /// Single source of truth for design tokens.
 enum Constants {
 
@@ -36,5 +55,12 @@ enum Constants {
         static let color:  Color  = .black.opacity(0.06)
         static let radius: CGFloat = 8
         static let y:      CGFloat = 4
+    }
+
+    // MARK: - Animation
+    enum Animation {
+        static let spring    = SwiftUI.Animation.spring(response: 0.35, dampingFraction: 0.7)
+        static let tabSwitch = SwiftUI.Animation.easeInOut(duration: 0.2)
+        static let pressScale: CGFloat = 0.97
     }
 }
