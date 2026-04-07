@@ -15,4 +15,26 @@ enum Constants {
     static let warning       = Color(hex: "FF9800")
     static let danger        = Color(hex: "E53935")
     static let cream         = Color(hex: "FFF8E1")
+
+    // MARK: - Corner Radii
+    enum Corner {
+        static let card:   CGFloat = 16
+        static let button: CGFloat = 14
+        static let chip:   CGFloat = 20
+    }
+
+    // MARK: - Padding / Spacing
+    enum Spacing {
+        static let horizontal: CGFloat = 16
+        static let vertical:   CGFloat = 12
+        static let card:       CGFloat = 16
+        static let section:    CGFloat = 24
+    }
+
+    // MARK: - Shadow (card standard)
+    enum Shadow {
+        static let color:  Color  = .black.opacity(0.06)
+        static let radius: CGFloat = 8
+        static let y:      CGFloat = 4
+    }
 }
