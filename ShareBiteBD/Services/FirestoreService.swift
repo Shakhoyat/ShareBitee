@@ -53,4 +53,30 @@ final class FirestoreService {
             ])
         }
     }
+
+    // MARK: - Reservations
+
+    func reserveServing(postId: String, quantity: Int = 1) async throws -> Int {
+        let ref = db.collection("foodPosts").document(postId)
+
+        let doc = try await ref.getDocument()
+        guard let currentQty = doc.data()?["availableQuantity"] as? Int,
+              currentQty >= quantity else {
+            throw NSError(
+                domain: "ShareBite",
+                code: -1,
+                userInfo: [NSLocalizedDescriptionKey: "Not enough servings available"]
+            )
+        }
+
+        let newQty = currentQty - quantity
+        var update: [String: Any] = [
+            "availableQuantity": FieldValue.increment(Int64(-quantity))
+        ]
+        if newQty == 0 {
+            update["status"] = PostStatus.fullyClaimed.rawValue
+        }
+        try await ref.updateData(update)
+        return newQty
+    }
 }
