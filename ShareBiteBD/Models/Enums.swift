@@ -43,3 +43,32 @@ enum FoodCategory: String, Codable, CaseIterable, Identifiable {
         }
     }
 }
+
+// MARK: - DietaryTag
+enum DietaryTag: String, Codable, CaseIterable, Identifiable {
+    case halal, vegetarian, vegan, nutFree, glutenFree
+
+    var id: String { rawValue }
+
+    var label: String {
+        switch self {
+        case .halal:      return "Halal"
+        case .vegetarian: return "Vegetarian"
+        case .vegan:      return "Vegan"
+        case .nutFree:    return "Nut-Free"
+        case .glutenFree: return "Gluten-Free"
+        }
+    }
+}
+
+// MARK: - PostStatus
+enum PostStatus: String, Codable {
+    case available
+    case partiallyClaimed = "partially_claimed"
+    case fullyClaimed     = "fully_claimed"
+}
+
+// MARK: - BookingStatus
+enum BookingStatus: String, Codable {
+    case pending, confirmed, completed, cancelled
+}
